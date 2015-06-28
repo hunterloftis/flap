@@ -7,7 +7,8 @@
     getPosition: getPosition,
     getVelocity: getVelocity,
     getAcceleration: getAcceleration,
-    box: box
+    box: box,
+    setY: setY
   };
 
   function create(x, y) {
@@ -21,6 +22,10 @@
     var vy = (pos[1] - prev[1]) / pos[2];
     state.unshift([pos[0] + vx * seconds, pos[1] + vy * seconds, seconds]);
     state.pop();
+  }
+
+  function setY(state, y) {
+    state[0][1] = y;
   }
 
   function force(state, dx, dy) {

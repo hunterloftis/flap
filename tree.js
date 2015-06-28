@@ -7,7 +7,7 @@ function Tree() {
     var depth = -10 + 40 * Math.random();
     return {
       x: 800 * Math.random(),
-      width: 20 + 10 * Math.random(),
+      width: 15 + 25 * Math.random(),
       depth: -20 + 50 * Math.random(),
       color: randomColor(depth)
     };

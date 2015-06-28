@@ -6,11 +6,12 @@ function Player() {
     step: step
   };
 
-  function create() {
+  function create(x, y) {
     return {
-      position: Particle.create(400, 100),
-      speed: 700,
-      traction: 100,
+      position: Particle.create(x, y),
+      speed: 500,
+      traction: 70,
+      drag: 20,
       onGround: false,
       jumpPower: 1200,
       springTime: 0.05,
@@ -20,11 +21,11 @@ function Player() {
     };
   }
 
-  function step(state, seconds, input) {
+  function step(state, platforms, seconds, input) {
     Particle.step(state.position, seconds);
 
     fall(state, seconds);
-    findGround(state);
+    findGround(state, platforms);
 
     if (input.left && !input.right) walkLeft(state, seconds);
     else if (input.right && !input.left) walkRight(state, seconds);
@@ -61,19 +62,31 @@ function Player() {
   }
 
   function stop(state, seconds) {
-    if (state.onGround) {
-      var vel = Particle.getVelocity(state.position).x;
-      var force = Math.min(Math.abs(vel), Math.abs(state.traction));
-      var sign = -Math.sign(vel);
-      Particle.force(state.position, force * seconds * sign, 0);
-    }
+    var friction = state.onGround ? state.traction : state.drag;
+    var vel = Particle.getVelocity(state.position).x;
+    var force = Math.min(Math.abs(vel), Math.abs(friction));
+    var sign = -Math.sign(vel);
+    Particle.force(state.position, force * seconds * sign, 0);
   }
 
-  function findGround(state) {
+  function findGround(state, platforms) {
     var pos = Particle.getPosition(state.position);
-    state.onGround = pos.y >= 600;
-    if (state.onGround) {
+    if (pos.y >= 600) {
+      state.onGround = true;
       state.jumpPowerAvailable = state.jumpPower;
+    }
+    else {
+      var vel = Particle.getVelocity(state.position);
+      if (vel.y >= 0) {
+        for (var i = 0; i < platforms.length; i++) {
+          var p = platforms[i];
+          if (pos.y >= p.y && pos.y <= p.y + 30 && Math.abs(pos.x - p.x) < (p.width * 0.5)) {
+            state.onGround = true;
+            state.jumpPowerAvailable = state.jumpPower;
+            Particle.setY(state.position, p.y);
+          }
+        }
+      }
     }
   }
 

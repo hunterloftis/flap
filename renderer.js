@@ -28,6 +28,7 @@ function Renderer(getState, el) {
     state.trees.forEach(renderBackgroundTree);
     renderDude(state.dude);
     state.trees.forEach(renderForegroundTree);
+    state.platforms.forEach(renderPlatform);
 
     requestAnimationFrame(render);
   }
@@ -35,6 +36,33 @@ function Renderer(getState, el) {
   function clear() {
     ctx.fillStyle = grd;
     ctx.fillRect(0, 0, 800, 600);
+  }
+
+  function renderPlatform(state) {
+    ctx.save();
+    ctx.translate(state.x, state.y);
+    ctx.fillStyle = '#113322';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#338844';
+    var left = -state.width * 0.5;
+    var right = state.width * 0.5;
+    var size = 30;
+    var count = Math.floor(state.width / (size + 2));
+    var step = state.width / count;
+    for (var x = left; x < right; x += step) {
+      ctx.beginPath();
+      ctx.rect(x, 0, size, size);
+      ctx.fill();
+      ctx.stroke();
+    }
+    for (var x = left + step; x <= right - step; x += step * 2) {
+      ctx.beginPath();
+      ctx.rect(x - 10, size + 7, 14, 14);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   function renderBackgroundTree(state) {
@@ -77,7 +105,7 @@ function Renderer(getState, el) {
     // bob
     ctx.translate(0, -2);
     if (state.onGround) {
-      ctx.translate(0, pos.x % 20 * -0.3);
+      ctx.translate(0, pos.x % 30 * -0.2);
     }
 
     // body
@@ -112,7 +140,7 @@ function Renderer(getState, el) {
     // wings
     ctx.fillStyle = '#00ffff';
     ctx.beginPath();
-    ctx.rect(-5, -30, -20, 5);
+    ctx.rect(-5, -25, -20, -5);
     ctx.fill();
     ctx.stroke();
 
